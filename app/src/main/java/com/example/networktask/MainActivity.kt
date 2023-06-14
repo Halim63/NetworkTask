@@ -21,6 +21,9 @@ import com.example.networktask.viewmodel.CacheViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_capture_photo.img
 import kotlinx.android.synthetic.main.list_item.rv_img
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -39,7 +42,10 @@ class MainActivity : AppCompatActivity() {
         cacheViewModel.imageLiveData.observe(this){
                 adaptor.submitList(it)
         }
-        cacheViewModel.getImages()
+
+            cacheViewModel.getImages()
+
+
 
 
         fb_add_photo.setOnClickListener {
@@ -62,7 +68,8 @@ class MainActivity : AppCompatActivity() {
 
 
     private val permissionCamera =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        registerForActivityResult(ActivityResultContracts.RequestPermission())
+        {
             if (it) {
                 Toast.makeText(applicationContext, "Permission granted", Toast.LENGTH_LONG).show()
             } else {

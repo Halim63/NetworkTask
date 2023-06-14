@@ -13,8 +13,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Inject
-@EntryPoint
-@InstallIn(SingletonComponent::class)
+//@EntryPoint
+//@InstallIn(SingletonComponent::class)
 @Dao
 interface ImageDao
 {

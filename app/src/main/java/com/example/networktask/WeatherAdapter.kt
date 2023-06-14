@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.loadAny
 import com.example.networktask.cache.Image
 import com.example.networktask.databinding.ListItemBinding
 
-class WeatherAdapter() :ListAdapter<Image,WeatherAdapter.WeatherViewHolder>(UserDiffUtil()),
-    Parcelable {
+class WeatherAdapter() :ListAdapter<Image,WeatherAdapter.WeatherViewHolder>(UserDiffUtil()){
     class WeatherViewHolder (val binding: ListItemBinding) : RecyclerView.ViewHolder(binding.root){
 
     }
@@ -32,24 +32,6 @@ class WeatherAdapter() :ListAdapter<Image,WeatherAdapter.WeatherViewHolder>(User
 //        holder.binding.rvImg.loadAny()
     }
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<WeatherAdapter> {
-        override fun createFromParcel(parcel: Parcel): WeatherAdapter {
-            return WeatherAdapter(parcel)
-        }
-
-        override fun newArray(size: Int): Array<WeatherAdapter?> {
-            return arrayOfNulls(size)
-        }
-    }
-
 
 }
 
@@ -62,7 +44,7 @@ class UserDiffUtil:DiffUtil.ItemCallback<Image>() {
 
 
     override fun areContentsTheSame(oldItem: Image, newItem: Image): Boolean {
-        return oldItem == newItem
+        return oldItem.id == newItem.id
     }
 }
 

@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.networktask.cache.CacheRepository
+import com.example.networktask.cache.Image
 import com.example.networktask.remote.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -47,13 +48,13 @@ class CapturePhotoViewModel
 
     }
     fun saveImageInDb(){
-        viewModelScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 cacheRepository.getAllImage()
-                saveImageInDbLiveData.value=true
+                saveImageInDbLiveData.postValue(true)
             }catch (e:Exception){
                 e.printStackTrace()
-                saveImageInDbLiveData.value=false
+                saveImageInDbLiveData.postValue(false)
 
             }
         }

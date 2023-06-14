@@ -15,14 +15,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CacheViewModel @Inject constructor(
-    application: Context,
-    private var cacheRepository: CacheRepository
+    private val cacheRepository: CacheRepository
     ) : ViewModel() {
      val imageLiveData = MutableLiveData<List<Image>>()
 
     init {
-        val dao = WeatherDatabase.invoke(application).getImage()
-        cacheRepository = CacheRepository(dao)
+//        val dao = WeatherDatabase.invoke(application).getImage()
+//        cacheRepository = CacheRepository(dao)
         getImages()
     }
 

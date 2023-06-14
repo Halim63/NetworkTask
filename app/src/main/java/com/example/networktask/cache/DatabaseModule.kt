@@ -24,12 +24,16 @@ class DatabaseModule {
     @Provides
     @Singleton
     fun provideDB(context: Application): WeatherDatabase {
-        return WeatherDatabase.invoke(context)
+        return Room.databaseBuilder(
+            context.applicationContext,
+            WeatherDatabase::class.java,
+            "image_database"
+        ).build()
     }
 
     @Provides
     @Singleton
-    fun provideDao(weatherDatabase: WeatherDatabase): ImageDao {
+    fun provideImageDao(weatherDatabase: WeatherDatabase): ImageDao {
         return weatherDatabase.getImage()
     }
 }
