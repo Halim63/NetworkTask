@@ -14,6 +14,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.networktask.databinding.ActivityCapturePhotoBinding
 import com.example.networktask.viewmodel.CapturePhotoViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,7 +28,6 @@ import java.util.Date
 
 @AndroidEntryPoint
 class CapturePhotoActivity : AppCompatActivity() {
-    private var sharePath = "no"
 
     val capturePhotoViewModel by viewModels<CapturePhotoViewModel>()
 
@@ -39,7 +39,6 @@ class CapturePhotoActivity : AppCompatActivity() {
 
         val bundle = intent.extras
         if (bundle != null) {
-//            val image = bundle.get("data") as Bitmap?
             val bitmap = bundle.getParcelable<Bitmap>("id")
             if (bitmap != null) {
                 img.setImageBitmap(bitmap)
@@ -48,7 +47,6 @@ class CapturePhotoActivity : AppCompatActivity() {
 //        capturePhotoViewModel = ViewModelProvider(this)[CapturePhotoViewModel::class.java]
         capturePhotoViewModel.tempLiveData.observe(this) {
             binding.tvWeather.text = "temp: $it"
-//            getScreenShotFromView(binding.cardView)
 
         }
         capturePhotoViewModel.getCurrentWeather()
