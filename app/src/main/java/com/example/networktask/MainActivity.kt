@@ -9,41 +9,50 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.networktask.cache.Image
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.networktask.databinding.ActivityMainBinding
-import com.example.networktask.remote.ApiInstance
 import kotlinx.android.synthetic.main.activity_main.*
-import com.example.networktask.remote.WeatherRepository
 import com.example.networktask.viewmodel.CacheViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_capture_photo.img
-import kotlinx.android.synthetic.main.list_item.rv_img
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    lateinit var cacheViewModel: CacheViewModel
     private lateinit var adaptor: WeatherAdapter
+    val cacheViewModel by viewModels<CacheViewModel>()
     lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.recyclerview.layoutManager = LinearLayoutManager(this)
+        binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
         adaptor = WeatherAdapter()
         binding.recyclerview.adapter = adaptor
-        cacheViewModel = ViewModelProvider(this)[CacheViewModel::class.java]
         cacheViewModel.imageLiveData.observe(this){
                 adaptor.submitList(it)
         }
+        ItemTouchHelper(
+            object :
+                ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder,
+                ): Boolean {
+                    return true
+                }
 
-            cacheViewModel.getImages()
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    cacheViewModel.deleteImage(adaptor.getImageAT(viewHolder.adapterPosition))
+                }
+
+            }).attachToRecyclerView(binding.recyclerview)
+
+
 
 
 
@@ -54,6 +63,11 @@ class MainActivity : AppCompatActivity() {
         }
         permissionCamera.launch(Manifest.permission.CAMERA)
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        cacheViewModel.getImages()
     }
 
     private val takePhoto =
@@ -70,15 +84,16 @@ class MainActivity : AppCompatActivity() {
     private val permissionCamera =
         registerForActivityResult(ActivityResultContracts.RequestPermission())
         {
-            if (it) {
-                Toast.makeText(applicationContext, "Permission granted", Toast.LENGTH_LONG).show()
-            } else {
-                Toast.makeText(applicationContext, "Permission not granted", Toast.LENGTH_LONG)
-                    .show()
-
-            }
+//            if (it) {
+//                Toast.makeText(applicationContext, "Permission granted", Toast.LENGTH_LONG).show()
+//            } else {
+//                Toast.makeText(applicationContext, "Permission not granted", Toast.LENGTH_LONG)
+//                    .show()
+//
+//            }
 
         }
+
 
 }
 

@@ -47,10 +47,11 @@ class CapturePhotoViewModel
 
 
     }
-    fun saveImageInDb(){
+    fun saveImageInDb(image: Image){
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                cacheRepository.getAllImage()
+                cacheRepository.insertImage(image)
                 saveImageInDbLiveData.postValue(true)
             }catch (e:Exception){
                 e.printStackTrace()

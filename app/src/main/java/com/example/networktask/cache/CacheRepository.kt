@@ -8,13 +8,11 @@ class CacheRepository @Inject constructor(
 
     fun getAllImage() = imageDao.getAllImage()
 
-    suspend fun upsertByReplacement(image: List<Image>){
-        imageDao.upsertByReplacement(image)
+    fun insertImage(image: Image){
+        imageDao.insertImage(image)
     }
-//    suspend fun findById(id: Int){
-//        imageDao.findById(id)
-//    }
-    suspend fun delete(image: Image){
+
+    fun delete(image: Image){
         imageDao.delete(image)
     }
 

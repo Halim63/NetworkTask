@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import coil.loadAny
 import com.example.networktask.cache.Image
 import com.example.networktask.databinding.ListItemBinding
@@ -17,8 +18,7 @@ class WeatherAdapter() :ListAdapter<Image,WeatherAdapter.WeatherViewHolder>(User
     }
 
 
-    constructor(parcel: Parcel) : this() {
-    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeatherViewHolder {
         val inflator=LayoutInflater.from(parent.context)
@@ -28,11 +28,14 @@ class WeatherAdapter() :ListAdapter<Image,WeatherAdapter.WeatherViewHolder>(User
 
     override fun onBindViewHolder(holder: WeatherViewHolder, position: Int) {
         val weather =currentList[position]
-
-//        holder.binding.rvImg.loadAny()
+//        holder.binding.card?.setCardBackgroundColor(holder.itemView.resources.getColor(R.color.purple_200,
+//            null))
+        holder.binding.rvImg.load(weather.data)
     }
 
-
+    fun getImageAT(position: Int):Image {
+        return currentList[position]
+    }
 }
 
 

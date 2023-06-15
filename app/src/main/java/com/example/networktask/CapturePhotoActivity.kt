@@ -1,8 +1,9 @@
 package com.example.networktask
 
+import android.Manifest
 import android.content.ContentValues
+import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.net.Uri
 import android.os.Build
@@ -12,18 +13,25 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
+import androidx.core.app.ActivityCompat
+import com.example.networktask.cache.Image
 import com.example.networktask.databinding.ActivityCapturePhotoBinding
 import com.example.networktask.viewmodel.CapturePhotoViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_capture_photo.*
+import kotlinx.android.synthetic.main.activity_capture_photo.img
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.OutputStream
-import java.util.Calendar
-import java.util.Date
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.Arrays
 
 
 @AndroidEntryPoint
@@ -33,18 +41,14 @@ class CapturePhotoActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCapturePhotoBinding
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         binding = ActivityCapturePhotoBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        callCameraToCapturePhoto()
+        permissionStorge.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        permissionStorge.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
 
-        val bundle = intent.extras
-        if (bundle != null) {
-            val bitmap = bundle.getParcelable<Bitmap>("id")
-            if (bitmap != null) {
-                img.setImageBitmap(bitmap)
-            }
-        }
-//        capturePhotoViewModel = ViewModelProvider(this)[CapturePhotoViewModel::class.java]
         capturePhotoViewModel.tempLiveData.observe(this) {
             binding.tvWeather.text = "temp: $it"
 
@@ -53,48 +57,36 @@ class CapturePhotoActivity : AppCompatActivity() {
         capturePhotoViewModel.saveImageInDbLiveData.observe(this) { isImageSaved ->
             if (isImageSaved) {
                 finish()
+
             } else {
                 Toast.makeText(this, "Can Not Save Image", Toast.LENGTH_LONG).show()
             }
         }
+
         binding.fbDonePhoto.setOnClickListener {
-            capturePhotoViewModel.saveImageInDb()
-            getScreenShotFromView(constraintView)
+            onBtnSaveClicked()
 
         }
+
     }
 
+
     private fun saveMediaToStorage(bitmap: Bitmap) {
-        // Generating a file name
         val filename = "${System.currentTimeMillis()}.jpg"
-
-        // Output stream
         var fos: OutputStream? = null
-
-        // For devices running android >= Q
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // getting the contentResolver
             this.contentResolver?.also { resolver ->
 
-                // Content resolver will process the contentvalues
                 val contentValues = ContentValues().apply {
-
-                    // putting file information in content values
                     put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
                     put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg")
                     put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
                 }
-
-                // Inserting the contentValues to
-                // contentResolver and getting the Uri
                 val imageUri: Uri? =
                     resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-
-                // Opening an outputstream with the Uri that we got
                 fos = imageUri?.let { resolver.openOutputStream(it) }
             }
         } else {
-            // These for devices running on android < Q
             val imagesDir =
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
             val image = File(imagesDir, filename)
@@ -102,27 +94,86 @@ class CapturePhotoActivity : AppCompatActivity() {
         }
 
         fos?.use {
-            // Finally writing the bitmap to the output stream that we opened
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
             Toast.makeText(this, "Captured View and saved to Gallery", Toast.LENGTH_SHORT).show()
         }
     }
 
 
-    private fun getScreenShotFromView(v: View): Bitmap? {
-        // create a bitmap object
-        var screenshot: Bitmap? = null
-        try {
-
-            screenshot =
-                Bitmap.createBitmap(v.measuredWidth, v.measuredHeight, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(screenshot)
-            v.draw(canvas)
-        } catch (e: Exception) {
-            Log.e("GFG", "Failed to capture screenshot because:" + e.message)
+    fun onBtnSaveClicked() {
+        val bitmapScreenShot = convertViewToBitmap(this, binding.cardView)
+        if (bitmapScreenShot != null) {
+            saveMediaToStorage(bitmapScreenShot)
         }
-        return screenshot
+        if (bitmapScreenShot == null) {
+            Toast.makeText(this, "something_went_wrong", Toast.LENGTH_LONG).show()
+            return
+        }
+        val file = convertBitmapToFile(this, bitmapScreenShot)
+        val byteArray = convertFileToByteArray(file)
+        capturePhotoViewModel.saveImageInDb(Image(byteArray))
+
     }
+
+    private fun convertFileToByteArray(file: File): ByteArray {
+        return file.readBytes()
+    }
+
+    private fun convertBitmapToFile(context: Context, bitmap: Bitmap): File {
+        val file = File(context.cacheDir, "img.png")
+        file.createNewFile()
+        val bos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos)
+        val bitmapData = bos.toByteArray()
+        val fos = FileOutputStream(file)
+        fos.write(bitmapData)
+        fos.flush()
+        fos.close()
+        return file
+    }
+
+    private fun convertViewToBitmap(context: Context, view: View): Bitmap? {
+        var screenShot: Bitmap? = null
+        try {
+            screenShot = Bitmap.createBitmap(
+                view.measuredWidth,
+                view.measuredHeight,
+                Bitmap.Config.ARGB_8888
+            )
+
+            val canvas = Canvas(screenShot)
+            view.draw(canvas)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            return screenShot
+        }
+    }
+
+
+    private fun callCameraToCapturePhoto() {
+        val bundle = intent.extras
+        if (bundle != null) {
+            val bitmap = bundle.getParcelable<Bitmap>("id")
+            if (bitmap != null) {
+                img.setImageBitmap(bitmap)
+            }
+        }
+    }
+
+
+    private val permissionStorge =
+        registerForActivityResult(ActivityResultContracts.RequestPermission())
+        {
+//            if (it) {
+//                Toast.makeText(applicationContext, "Permission s", Toast.LENGTH_LONG).show()
+//            } else {
+//                Toast.makeText(applicationContext, "Permission not s", Toast.LENGTH_LONG)
+//                    .show()
+//
+//            }
+
+        }
 
 }
 

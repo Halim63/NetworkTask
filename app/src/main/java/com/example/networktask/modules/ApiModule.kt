@@ -1,5 +1,6 @@
-package com.example.networktask.remote
+package com.example.networktask.modules
 
+import com.example.networktask.remote.ApiServiceInterface
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,7 +13,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ApiInstance {
+object ApiModule {
     private const val BASE_URL ="https://api.openweathermap.org/data/2.5/"
     @Provides
     @Singleton

@@ -1,12 +1,12 @@
-package com.example.networktask.cache
+package com.example.networktask.modules
 
 import android.app.Application
-import android.content.Context
 import androidx.room.Room
+import com.example.networktask.cache.ImageDao
+import com.example.networktask.cache.WeatherDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -14,13 +14,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class DatabaseModule {
 
-    //    @Provides
-//    @Singleton
-//    fun provide(@ApplicationContext context: Context) = Room.databaseBuilder(
-//        context, WeatherDatabase::class.java, "image_database")
-//        .allowMainThreadQueries()
-//        .fallbackToDestructiveMigration()
-//        .build()
     @Provides
     @Singleton
     fun provideDB(context: Application): WeatherDatabase {
