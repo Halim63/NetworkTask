@@ -3,17 +3,17 @@ package com.example.networktask.cache
 import javax.inject.Inject
 
 class CacheRepository @Inject constructor(
-    private val imageDao: ImageDao
-    ) {
+    private val imageDao: ImageDao,
+) {
 
     fun getAllImage() = imageDao.getAllImage()
 
-    fun insertImage(image: Image){
-        imageDao.insertImage(image)
+    fun insertImage(imageDbEntity: ImageDbEntity) {
+        imageDao.insertImage(imageDbEntity)
     }
 
-    fun delete(image: Image){
-        imageDao.delete(image)
+    fun delete(imageDbEntity: ImageDbEntity) {
+        imageDao.delete(imageDbEntity)
     }
 
 }

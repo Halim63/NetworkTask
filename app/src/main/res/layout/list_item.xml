@@ -10,22 +10,15 @@
     android:layout_margin="8dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+
     <ImageView
         android:id="@+id/rv_img"
-        android:layout_width="200dp"
-        android:layout_height="150dp"
-        android:paddingStart="10dp"
-        android:paddingTop="10dp"
-        android:src="@color/black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
        />
-</LinearLayout>
-
 
 
 

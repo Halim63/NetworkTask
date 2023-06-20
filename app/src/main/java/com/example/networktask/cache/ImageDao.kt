@@ -1,6 +1,5 @@
 package com.example.networktask.cache
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -10,15 +9,14 @@ import androidx.room.Query
 //@EntryPoint
 //@InstallIn(SingletonComponent::class)
 @Dao
-interface ImageDao
-{
+interface ImageDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertImage(image: Image)
+    fun insertImage(imageDbEntity: ImageDbEntity)
 
-    @Query("SELECT * FROM image")
-    fun getAllImage(): List<Image>
+    @Query("SELECT * FROM imagedbentity")
+    fun getAllImage(): List<ImageDbEntity>
 
 
     @Delete
-    fun delete(image: Image)
+    fun delete(imageDbEntity: ImageDbEntity)
 }

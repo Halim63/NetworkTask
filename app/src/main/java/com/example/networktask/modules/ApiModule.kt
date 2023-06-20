@@ -14,7 +14,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ApiModule {
-    private const val BASE_URL ="https://api.openweathermap.org/data/2.5/"
+    private const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
+
     @Provides
     @Singleton
     fun getInstance(): ApiServiceInterface {
@@ -25,6 +26,7 @@ object ApiModule {
             .build()
             .create(ApiServiceInterface::class.java)
     }
+
     private fun createLoggingInterceptor(): OkHttpClient {
         val interceptor = HttpLoggingInterceptor()
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)

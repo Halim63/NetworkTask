@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.networktask.cache.CacheRepository
-import com.example.networktask.cache.Image
+import com.example.networktask.cache.ImageDbEntity
 import com.example.networktask.remote.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -14,13 +14,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CapturePhotoViewModel
-    @Inject constructor(
-        private val weatherRepository: WeatherRepository,
-        private val cacheRepository: CacheRepository,
+@Inject constructor(
+    private val weatherRepository: WeatherRepository,
+    private val cacheRepository: CacheRepository,
 
-        ) : ViewModel() {
+    ) : ViewModel() {
     val tempLiveData = MutableLiveData<Double>()
-    val saveImageInDbLiveData=MutableLiveData<Boolean>()
+    val saveImageInDbLiveData = MutableLiveData<Boolean>()
 
 
     fun getCurrentWeather() {
@@ -47,13 +47,14 @@ class CapturePhotoViewModel
 
 
     }
-    fun saveImageInDb(image: Image){
+
+    fun saveImageInDb(imageDbEntity: ImageDbEntity) {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                cacheRepository.insertImage(image)
+                cacheRepository.insertImage(imageDbEntity)
                 saveImageInDbLiveData.postValue(true)
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
                 saveImageInDbLiveData.postValue(false)
 

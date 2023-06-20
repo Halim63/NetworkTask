@@ -3,7 +3,7 @@ package com.example.networktask.modules
 import android.app.Application
 import androidx.room.Room
 import com.example.networktask.cache.ImageDao
-import com.example.networktask.cache.WeatherDatabase
+import com.example.networktask.cache.ImageDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,18 +16,18 @@ class DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDB(context: Application): WeatherDatabase {
+    fun provideDB(context: Application): ImageDatabase {
         return Room.databaseBuilder(
             context.applicationContext,
-            WeatherDatabase::class.java,
+            ImageDatabase::class.java,
             "image_database"
         ).build()
     }
 
     @Provides
     @Singleton
-    fun provideImageDao(weatherDatabase: WeatherDatabase): ImageDao {
-        return weatherDatabase.getImage()
+    fun provideImageDao(imageDatabase: ImageDatabase): ImageDao {
+        return imageDatabase.getImage()
     }
 }
 
