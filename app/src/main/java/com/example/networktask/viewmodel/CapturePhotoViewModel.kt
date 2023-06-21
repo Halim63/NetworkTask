@@ -3,7 +3,7 @@ package com.example.networktask.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.networktask.cache.CacheRepository
+import com.example.networktask.cache.ImagesCacheRepository
 import com.example.networktask.cache.ImageDbEntity
 import com.example.networktask.remote.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class CapturePhotoViewModel
 @Inject constructor(
     private val weatherRepository: WeatherRepository,
-    private val cacheRepository: CacheRepository,
+    private val imagesCacheRepository: ImagesCacheRepository,
 
     ) : ViewModel() {
     val tempLiveData = MutableLiveData<Double>()
@@ -29,18 +29,14 @@ class CapturePhotoViewModel
             val response = try {
                 weatherRepository.getCurrentWeather()
             } catch (e: IOException) {
-//                Toast.makeText(applicationContext, "app error ${e.message}", Toast.LENGTH_LONG)
-//                    .show()
                 return@launch
             } catch (e: HttpException) {
-
-//                Toast.makeText(applicationContext, "app error ${e.message}", Toast.LENGTH_LONG)
-//                    .show()
                 return@launch
             }
             if (response.isSuccessful && response.body() != null) {
+                val temperature=response.body()?.main?.temp
                 withContext(Dispatchers.Main) {
-                    tempLiveData.postValue(response.body()!!.main.temp)
+                    tempLiveData.postValue(temperature!!)
                 }
             }
         }
@@ -52,7 +48,7 @@ class CapturePhotoViewModel
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                cacheRepository.insertImage(imageDbEntity)
+                imagesCacheRepository.insertImage(imageDbEntity)
                 saveImageInDbLiveData.postValue(true)
             } catch (e: Exception) {
                 e.printStackTrace()

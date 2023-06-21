@@ -16,10 +16,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.networktask.viewmodel.CacheViewModel
+import com.example.networktask.cache.ImageDbEntity
+import com.example.networktask.viewmodel.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.fb_add_photo
 import kotlinx.android.synthetic.main.fragment_home.recyclerview
@@ -27,23 +26,49 @@ import kotlinx.android.synthetic.main.fragment_home.recyclerview
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var adaptor: PhotosAdapter
-    val cacheViewModel by viewModels<CacheViewModel>()
+    val homeViewModel by viewModels<HomeViewModel>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initView()
+        setupObservers()
+        requestCameraPermission()
+
+    }
+
+    private fun setupObservers() {
+        homeViewModel.imageDbEntityLiveData.observe(viewLifecycleOwner) {
+            adaptor.submitList(it)
+        }
+    }
+
+    private fun requestCameraPermission() = cameraPermission.launch(Manifest.permission.CAMERA)
+
+
+    private fun initView() {
+        setupPhotosRecyclerView()
+        fb_add_photo.setOnClickListener {
+            openCamera()
+
+        }
+    }
+
+    private fun setupPhotosRecyclerView() {
         recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
         adaptor = PhotosAdapter()
         recyclerview.adapter = adaptor
-        cacheViewModel.imageDbEntityLiveData.observe(viewLifecycleOwner) {
-            adaptor.submitList(it)
-        }
+        setupRecyclerViewSwapActions()
+
+    }
+
+    private fun setupRecyclerViewSwapActions() {
         ItemTouchHelper(
             object :
                 ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -56,35 +81,29 @@ class HomeFragment : Fragment() {
                 }
 
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    cacheViewModel.deleteImage(adaptor.getImageAT(viewHolder.adapterPosition))
+                    deletePhoto(adaptor.currentList[viewHolder.adapterPosition])
                 }
 
             }).attachToRecyclerView(recyclerview)
+    }
+
+    private fun deletePhoto(image: ImageDbEntity) = homeViewModel.deleteImage(image)
 
 
-
-
-
-
-        fb_add_photo.setOnClickListener {
-            val callCameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            takePhoto.launch(callCameraIntent)
-        }
-        permissionCamera.launch(Manifest.permission.CAMERA)
-
+    private fun openCamera() {
+        val callCameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        takePhoto.launch(callCameraIntent)
     }
 
     override fun onResume() {
         super.onResume()
-        cacheViewModel.getImages()
+        homeViewModel.getImages()
     }
 
     private val takePhoto =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
-                val action = HomeFragmentDirections.actionHomeFragmentToCapturePhotoFragment()
                 val imageBitmap = result.data?.extras?.get("data") as Bitmap
-
                 findNavController().navigate(
                     R.id.action_homeFragment_to_capturePhotoFragment,
                     bundleOf("id" to imageBitmap)
@@ -93,18 +112,8 @@ class HomeFragment : Fragment() {
         }
 
 
-    private val permissionCamera =
-        registerForActivityResult(ActivityResultContracts.RequestPermission())
-        {
-//            if (it) {
-//                Toast.makeText(applicationContext, "Permission granted", Toast.LENGTH_LONG).show()
-//            } else {
-//                Toast.makeText(applicationContext, "Permission not granted", Toast.LENGTH_LONG)
-//                    .show()
-//
-//            }
-
-        }
+    private val cameraPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
 
 }

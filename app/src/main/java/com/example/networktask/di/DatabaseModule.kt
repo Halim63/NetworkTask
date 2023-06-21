@@ -1,4 +1,4 @@
-package com.example.networktask.modules
+package com.example.networktask.di
 
 import android.app.Application
 import androidx.room.Room

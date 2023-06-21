@@ -30,45 +30,71 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 
+private const val PHOTO_FILE_NAME = "captured_photo.png"
+private const val PHOTO_QUALITY = 100
+
 @AndroidEntryPoint
 class CapturePhotoFragment : Fragment() {
 
-    val capturePhotoViewModel by viewModels<CapturePhotoViewModel>()
+    private val capturePhotoViewModel by viewModels<CapturePhotoViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_capture_photo, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        callCameraToCapturePhoto()
-        permissionStorge.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        permissionStorge.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
 
-        capturePhotoViewModel.tempLiveData.observe(viewLifecycleOwner) {
-            tvWeather.text = "temp: $it"
+        initView()
+        requestStoragePermission()
+        setupObservers()
+        fetchData()
+
+
+    }
+
+    private fun initView() {
+        initCapturedImageView()
+
+        fb_done_photo.setOnClickListener {
+            onDoneBtnClicked()
 
         }
-        capturePhotoViewModel.getCurrentWeather()
+    }
+
+    private fun fetchData() = capturePhotoViewModel.getCurrentWeather()
+
+
+    private fun setupObservers() {
+        setupWeatherObserver()
+        setupSaveImageObserver()
+    }
+
+    private fun setupSaveImageObserver() {
         capturePhotoViewModel.saveImageInDbLiveData.observe(viewLifecycleOwner) { isImageSaved ->
             if (isImageSaved) {
                 findNavController().navigateUp()
 
             } else {
-                Toast.makeText(requireContext(), "Can Not Save Image", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), R.string.can_not_save_image, Toast.LENGTH_LONG)
+                    .show()
             }
         }
+    }
 
-        fb_done_photo.setOnClickListener {
-            onBtnSaveClicked()
+    private fun setupWeatherObserver() {
+        capturePhotoViewModel.tempLiveData.observe(viewLifecycleOwner) { temp ->
+            tvWeather.text = "temp: $temp"
 
         }
+    }
 
-
+    private fun requestStoragePermission() {
+        storagePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        storagePermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
     }
 
     private fun saveMediaToStorage(bitmap: Bitmap) {
@@ -94,17 +120,13 @@ class CapturePhotoFragment : Fragment() {
         }
 
         fos?.use {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
-            Toast.makeText(
-                requireContext(),
-                "Captured View and saved to Gallery",
-                Toast.LENGTH_SHORT
-            ).show()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, PHOTO_QUALITY, it)
+
         }
     }
 
 
-    fun onBtnSaveClicked() {
+    private fun onDoneBtnClicked() {
         val bitmapScreenShot = convertViewToBitmap(requireContext(), card_View)
         if (bitmapScreenShot != null) {
             saveMediaToStorage(bitmapScreenShot)
@@ -124,7 +146,7 @@ class CapturePhotoFragment : Fragment() {
     }
 
     private fun convertBitmapToFile(context: Context, bitmap: Bitmap): File {
-        val file = File(context.cacheDir, "img.png")
+        val file = File(context.cacheDir, PHOTO_FILE_NAME)
         file.createNewFile()
         val bos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos)
@@ -155,7 +177,7 @@ class CapturePhotoFragment : Fragment() {
     }
 
 
-    private fun callCameraToCapturePhoto() {
+    private fun initCapturedImageView() {
         val bundle = arguments
         if (bundle != null) {
             val bitmap = bundle.getParcelable<Bitmap>("id")
@@ -166,18 +188,9 @@ class CapturePhotoFragment : Fragment() {
     }
 
 
-    private val permissionStorge =
+    private val storagePermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission())
-        {
-//            if (it) {
-//                Toast.makeText(applicationContext, "Permission s", Toast.LENGTH_LONG).show()
-//            } else {
-//                Toast.makeText(applicationContext, "Permission not s", Toast.LENGTH_LONG)
-//                    .show()
-//
-//            }
-
-        }
+        {}
 
 
 }

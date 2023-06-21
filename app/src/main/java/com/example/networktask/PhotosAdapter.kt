@@ -29,9 +29,6 @@ class PhotosAdapter() :
         holder.binding.rvImg.load(weather.data)
     }
 
-    fun getImageAT(position: Int): ImageDbEntity {
-        return currentList[position]
-    }
 }
 
 

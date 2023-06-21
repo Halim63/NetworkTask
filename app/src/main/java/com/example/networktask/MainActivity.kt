@@ -17,7 +17,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+
+        initView()
+        initNavigation()
+
+    }
+
+    private fun initNavigation() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController
@@ -25,6 +31,12 @@ class MainActivity : AppCompatActivity() {
             AppBarConfiguration(setOf(R.id.homeFragment, R.id.capturePhotoFragment))
         setupActionBarWithNavController(navController, appBarConfiguration)
     }
+
+    private fun initView() {
+        initToolBar()
+    }
+
+    private fun initToolBar() = setSupportActionBar(toolbar)
 
 
 }

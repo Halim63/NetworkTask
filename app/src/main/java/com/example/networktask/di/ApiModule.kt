@@ -1,4 +1,4 @@
-package com.example.networktask.modules
+package com.example.networktask.di
 
 import com.example.networktask.remote.ApiServiceInterface
 import dagger.Module

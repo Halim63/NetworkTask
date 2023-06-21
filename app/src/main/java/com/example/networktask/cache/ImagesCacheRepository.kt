@@ -2,7 +2,7 @@ package com.example.networktask.cache
 
 import javax.inject.Inject
 
-class CacheRepository @Inject constructor(
+class ImagesCacheRepository @Inject constructor(
     private val imageDao: ImageDao,
 ) {
 
