@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.networktask.HomeFragment"
+        android:name="com.networktask.HomeFragment"
         android:label="Home Screen"
         tools:layout="@layout/fragment_home">
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/capturePhotoFragment"
-        android:name="com.example.networktask.CapturePhotoFragment"
+        android:name="com.networktask.CapturePhotoFragment"
         android:label="Capture Photo Screen"
         tools:layout="@layout/fragment_capture_photo" />
 </navigation>
