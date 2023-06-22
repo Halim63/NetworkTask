@@ -1,4 +1,4 @@
-package com.networktask
+package com.networktask.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.networktask.databinding.ListItemBinding
-import com.networktask.cache.ImageDbEntity
+import com.networktask.repos.imagesRepo.ImageDbEntity
 
 class PhotosAdapter() :
     ListAdapter<ImageDbEntity, PhotosAdapter.WeatherViewHolder>(UserDiffUtil()) {

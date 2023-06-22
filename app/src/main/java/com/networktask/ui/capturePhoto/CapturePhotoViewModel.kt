@@ -1,11 +1,11 @@
-package com.networktask.viewmodel
+package com.networktask.ui.capturePhoto
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.networktask.cache.ImageDbEntity
-import com.networktask.cache.ImagesCacheRepository
-import com.networktask.remote.WeatherRepository
+import com.networktask.repos.imagesRepo.ImageDbEntity
+import com.networktask.repos.imagesRepo.ImagesCacheRepository
+import com.networktask.repos.weatherRepo.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import retrofit2.HttpException

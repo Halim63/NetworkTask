@@ -1,4 +1,4 @@
-package com.networktask
+package com.networktask.ui.capturePhoto
 
 import android.Manifest
 import android.content.ContentValues
@@ -19,8 +19,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.networktask.R
-import com.networktask.cache.ImageDbEntity
-import com.networktask.viewmodel.CapturePhotoViewModel
+import com.networktask.repos.imagesRepo.ImageDbEntity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_capture_photo.card_View
 import kotlinx.android.synthetic.main.fragment_capture_photo.fb_done_photo

@@ -1,6 +1,5 @@
-package com.networktask.remote
+package com.networktask.repos.weatherRepo
 
-import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
 const val API_KEY = "b97049b17f7788359f444e2f8b0b356c"

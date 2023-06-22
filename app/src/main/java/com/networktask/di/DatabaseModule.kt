@@ -2,9 +2,9 @@ package com.networktask.di
 
 import android.app.Application
 import androidx.room.Room
-import com.networktask.cache.ImageDao
+import com.networktask.repos.imagesRepo.ImageDao
 
-import com.networktask.cache.ImageDatabase
+import com.networktask.repos.imagesRepo.ImageDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

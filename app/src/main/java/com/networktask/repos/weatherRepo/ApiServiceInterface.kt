@@ -1,4 +1,4 @@
-package com.networktask.remote
+package com.networktask.repos.weatherRepo
 
 import com.networktask.models.Image
 import retrofit2.Response

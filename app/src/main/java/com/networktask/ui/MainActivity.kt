@@ -1,4 +1,4 @@
-package com.networktask
+package com.networktask.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

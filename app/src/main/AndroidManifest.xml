@@ -24,7 +24,7 @@
         android:theme="@style/Theme.NetworkTask"
         tools:targetApi="31">
         <activity
-            android:name="com.networktask.MainActivity"
+            android:name="com.networktask.ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

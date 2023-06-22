@@ -1,4 +1,4 @@
-package com.networktask.cache
+package com.networktask.repos.imagesRepo
 
 import androidx.room.Dao
 import androidx.room.Delete

@@ -1,6 +1,6 @@
 package com.networktask.di
 
-import com.networktask.remote.ApiServiceInterface
+import com.networktask.repos.weatherRepo.ApiServiceInterface
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

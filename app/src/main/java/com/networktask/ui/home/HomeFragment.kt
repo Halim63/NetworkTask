@@ -1,4 +1,4 @@
-package com.networktask
+package com.networktask.ui.home
 
 import android.Manifest
 import android.content.Intent
@@ -18,8 +18,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.networktask.R
-import com.networktask.cache.ImageDbEntity
-import com.networktask.viewmodel.HomeViewModel
+import com.networktask.ui.PhotosAdapter
+import com.networktask.repos.imagesRepo.ImageDbEntity
 
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.fb_add_photo
