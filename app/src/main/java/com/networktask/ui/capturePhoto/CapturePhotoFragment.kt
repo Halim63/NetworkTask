@@ -86,7 +86,7 @@ class CapturePhotoFragment : Fragment() {
     }
 
     private fun setupWeatherObserver() {
-        capturePhotoViewModel.tempLiveData.observe(viewLifecycleOwner) { temp ->
+        capturePhotoViewModel.temperatureLiveData.observe(viewLifecycleOwner) { temp ->
             tvWeather.text = "temp: $temp"
 
         }
@@ -127,7 +127,7 @@ class CapturePhotoFragment : Fragment() {
 
 
     private fun onDoneBtnClicked() {
-        val bitmapScreenShot = convertViewToBitmap(requireContext(), card_View)
+        val bitmapScreenShot = convertViewToBitmap( card_View)
         if (bitmapScreenShot != null) {
             saveMediaToStorage(bitmapScreenShot)
         }
@@ -159,7 +159,7 @@ class CapturePhotoFragment : Fragment() {
         return file
     }
 
-    private fun convertViewToBitmap(context: Context, view: View): Bitmap? {
+    private fun convertViewToBitmap( view: View): Bitmap? {
         var screenShot: Bitmap? = null
         try {
             screenShot = Bitmap.createBitmap(
