@@ -3,6 +3,8 @@ package com.networktask.ui.capturePhoto
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.networktask.base.Resource
+import com.networktask.base.State
 import com.networktask.repos.imagesRepo.ImageDbEntity
 import com.networktask.repos.imagesRepo.ImagesCacheRepository
 import com.networktask.repos.weatherRepo.WeatherRepository
@@ -10,7 +12,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.*
 import javax.inject.Inject
 
 const val TAG = "MainActivity"
@@ -22,7 +23,7 @@ class CapturePhotoViewModel
     private val imagesCacheRepository: ImagesCacheRepository,
 
     ) : ViewModel() {
-    val temperatureLiveData = MutableLiveData<Double>()
+    val temperatureLiveData = MutableLiveData<Resource<Double>>()
     val saveImageInDbLiveData = MutableLiveData<Boolean>()
     private val compositeDisposable = CompositeDisposable()
 
@@ -37,12 +38,12 @@ class CapturePhotoViewModel
                     { response ->
                         if (response.isSuccessful && response.body() != null) {
                             val temperature = response.body()?.main?.temp
-                            temperatureLiveData.postValue(temperature!!)
+                            temperatureLiveData.postValue(Resource.success(temperature!!))
 
                         }
                     },
-                    { throwable ->
-                        Log.d(TAG, "onError ${throwable.message}")
+                    {
+                        temperatureLiveData.postValue(Resource.error(message = State.ERROR.toString()))
 
                     })
         )

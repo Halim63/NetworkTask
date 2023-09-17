@@ -6,4 +6,5 @@
     <string name="can_not_save_image">\n</string>
     <string name="something_went_wrong" />
     <string name="todo">TODO</string>
+    <string name="weather_temp" formatted="true">Temp: %.2f</string>
 </resources>
