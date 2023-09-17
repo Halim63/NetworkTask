@@ -19,12 +19,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.networktask.R
+import com.example.networktask.databinding.FragmentCapturePhotoBinding
+import com.google.android.material.snackbar.Snackbar
+import com.networktask.base.State
+import com.networktask.extensions.gone
+import com.networktask.extensions.inVisible
+import com.networktask.extensions.visible
 import com.networktask.repos.imagesRepo.ImageDbEntity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_capture_photo.card_View
-import kotlinx.android.synthetic.main.fragment_capture_photo.fb_done_photo
-import kotlinx.android.synthetic.main.fragment_capture_photo.img
-import kotlinx.android.synthetic.main.fragment_capture_photo.tvWeather
+import okhttp3.internal.format
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -35,14 +38,16 @@ private const val PHOTO_QUALITY = 100
 
 @AndroidEntryPoint
 class CapturePhotoFragment : Fragment() {
+    private lateinit var binding: FragmentCapturePhotoBinding
 
     private val capturePhotoViewModel by viewModels<CapturePhotoViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_capture_photo, container, false)
+    ): View {
+        binding = FragmentCapturePhotoBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -59,7 +64,7 @@ class CapturePhotoFragment : Fragment() {
     private fun initView() {
         initCapturedImageView()
 
-        fb_done_photo.setOnClickListener {
+        binding.fbDonePhoto.setOnClickListener {
             onDoneBtnClicked()
 
         }
@@ -79,17 +84,49 @@ class CapturePhotoFragment : Fragment() {
                 findNavController().navigateUp()
 
             } else {
-                Toast.makeText(requireContext(), R.string.can_not_save_image, Toast.LENGTH_LONG)
-                    .show()
+                showSnakeBarMessage(getString(R.string.can_not_save_image))
             }
         }
     }
 
     private fun setupWeatherObserver() {
-        capturePhotoViewModel.temperatureLiveData.observe(viewLifecycleOwner) { temp ->
-            tvWeather.text = "temp: $temp"
+        capturePhotoViewModel.temperatureLiveData.observe(viewLifecycleOwner) { result ->
+            when (result.state) {
+                State.LOADING -> onShowWeatherLoading()
+                State.SUCCESS -> onShowWeatherSuccess(result.result)
+                State.ERROR -> onShowWeatherError(result.errorMessage)
+            }
 
         }
+    }
+
+    private fun onShowWeatherLoading() {
+        binding.fbDonePhoto.isEnabled = false
+
+    }
+
+    private fun onShowWeatherSuccess(result: Double?) {
+        if (result == null) {
+            binding.fbDonePhoto.gone()
+            showSnakeBarMessage(getString(R.string.something_went_wrong))
+        }
+        binding.fbDonePhoto.isEnabled = true
+        binding.tvWeather.text =
+            result?.let { result -> format(getString(R.string.weather_temp), result) }
+    }
+
+
+    private fun onShowWeatherError(errorMessage: String?) {
+        binding.fbDonePhoto.gone()
+        showSnakeBarMessage(errorMessage ?: getString(R.string.something_went_wrong))
+    }
+
+    private fun showSnakeBarMessage(message: String) {
+        Snackbar.make(
+            binding.root,
+            message,
+            Snackbar.LENGTH_LONG
+        ).show()
     }
 
     private fun requestStoragePermission() {
@@ -127,13 +164,12 @@ class CapturePhotoFragment : Fragment() {
 
 
     private fun onDoneBtnClicked() {
-        val bitmapScreenShot = convertViewToBitmap( card_View)
+        val bitmapScreenShot = convertViewToBitmap(binding.cardView)
         if (bitmapScreenShot != null) {
             saveMediaToStorage(bitmapScreenShot)
         }
         if (bitmapScreenShot == null) {
-            Toast.makeText(requireContext(), R.string.something_went_wrong, Toast.LENGTH_LONG)
-                .show()
+            showSnakeBarMessage(getString(R.string.something_went_wrong))
             return
         }
         val file = convertBitmapToFile(requireContext(), bitmapScreenShot)
@@ -159,7 +195,7 @@ class CapturePhotoFragment : Fragment() {
         return file
     }
 
-    private fun convertViewToBitmap( view: View): Bitmap? {
+    private fun convertViewToBitmap(view: View): Bitmap? {
         var screenShot: Bitmap? = null
         try {
             screenShot = Bitmap.createBitmap(
@@ -183,7 +219,7 @@ class CapturePhotoFragment : Fragment() {
         if (bundle != null) {
             val bitmap = bundle.getParcelable<Bitmap>("id")
             if (bitmap != null) {
-                img.setImageBitmap(bitmap)
+                binding.img.setImageBitmap(bitmap)
             }
         }
     }

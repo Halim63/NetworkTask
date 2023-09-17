@@ -18,22 +18,24 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.networktask.R
+import com.example.networktask.databinding.FragmentHomeBinding
 import com.networktask.ui.PhotosAdapter
 import com.networktask.repos.imagesRepo.ImageDbEntity
-
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_home.fb_add_photo
-import kotlinx.android.synthetic.main.fragment_home.recyclerview
+
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
+    lateinit var binding: FragmentHomeBinding
+
     private lateinit var adaptor: PhotosAdapter
-    val homeViewModel by viewModels<HomeViewModel>()
+    private val viewModel by viewModels<HomeViewModel>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_home, container, false)
+    ): View {
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,8 +48,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        homeViewModel.imageDbEntityLiveData.observe(viewLifecycleOwner) {
-            adaptor.submitList(it)
+        viewModel.imageDbEntityLiveData.observe(viewLifecycleOwner) { list ->
+            adaptor.submitList(list)
         }
     }
 
@@ -56,16 +58,16 @@ class HomeFragment : Fragment() {
 
     private fun initView() {
         setupPhotosRecyclerView()
-        fb_add_photo.setOnClickListener {
+        binding.fbAddPhoto.setOnClickListener {
             openCamera()
 
         }
     }
 
     private fun setupPhotosRecyclerView() {
-        recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
+        binding.recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
         adaptor = PhotosAdapter()
-        recyclerview.adapter = adaptor
+        binding.recyclerview.adapter = adaptor
         setupRecyclerViewSwapActions()
 
     }
@@ -86,10 +88,10 @@ class HomeFragment : Fragment() {
                     deletePhoto(adaptor.currentList[viewHolder.adapterPosition])
                 }
 
-            }).attachToRecyclerView(recyclerview)
+            }).attachToRecyclerView(binding.recyclerview)
     }
 
-    private fun deletePhoto(image: ImageDbEntity) = homeViewModel.deleteImage(image)
+    private fun deletePhoto(image: ImageDbEntity) = viewModel.deleteImage(image)
 
 
     private fun openCamera() {
@@ -99,7 +101,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        homeViewModel.getImages()
+        viewModel.getImages()
     }
 
     private val takePhoto =
